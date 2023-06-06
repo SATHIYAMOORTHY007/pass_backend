@@ -1,18 +1,22 @@
 const jwt = require('jsonwebtoken')
 
 const verifyToken = (req, res, next) => {
-  console.log(req.headers)
-  const token = req.headers.Access_token
+  try {
+    console.log(JSON.stringify(req.headers))
+    const token = req.headers.Access_token
 
-  if (!token) {
-    return next(next(res.status(401)))
+    if (!token) {
+      return next(next(res.status(401)))
+    }
+
+    jwt.verify(token, process.env.JWT, (err, user) => {
+      if (err) return next(next(res.status(401)))
+      req.user = user
+      next()
+    })
+  } catch (err) {
+    console.log(err)
   }
-
-  jwt.verify(token, process.env.JWT, (err, user) => {
-    if (err) return next(next(res.status(401)))
-    req.user = user
-    next()
-  })
 }
 
 /* const verifyUser = (req, res, next) => {
